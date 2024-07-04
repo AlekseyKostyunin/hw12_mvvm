@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
                         binding.searchLayout.error = null
                         binding.button.isEnabled = true
                         binding.textResultSearch.text =
-                            "По запросу ${state.textSearch} ничего не найдено"
+                            "По запросу \"${state.textSearch}\" ничего не найдено"
                     }
 
                     is State.Error -> {
