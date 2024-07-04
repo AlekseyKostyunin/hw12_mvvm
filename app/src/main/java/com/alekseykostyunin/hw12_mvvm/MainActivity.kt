@@ -2,11 +2,10 @@ package com.alekseykostyunin.hw12_mvvm
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.viewModelScope
 import com.alekseykostyunin.hw12_mvvm.databinding.ActivityMainBinding
 import kotlinx.coroutines.launch
@@ -26,13 +25,17 @@ class MainActivity : AppCompatActivity() {
             viewModel.onSearchClick(binding.textForSearch.text.toString())
         }
 
+        binding.textForSearch.addTextChangedListener {
+            viewModel.onTextChanged(it.toString())
+        }
+
         viewModel.viewModelScope.launch {
             viewModel.state.collect { state ->
                 when (state) {
                     State.Initial -> {
                         binding.progress.isVisible = false
                         binding.searchLayout.error = null
-                        binding.button.isEnabled = true
+                        binding.button.isEnabled = false
                     }
 
                     State.Loading -> {
@@ -52,7 +55,7 @@ class MainActivity : AppCompatActivity() {
                     is State.Error -> {
                         binding.progress.isVisible = false
                         binding.searchLayout.error = state.textError
-                        binding.button.isEnabled = true
+                        binding.button.isEnabled = false
                         binding.textResultSearch.text = null
                     }
 
@@ -61,8 +64,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         viewModel.viewModelScope.launch {
-            viewModel.error.collect { message ->
-                Toast.makeText(this@MainActivity, message, Toast.LENGTH_LONG).show()
+            viewModel.isEnabledButtonSearch.collect { isEnable ->
+                binding.button.isEnabled = isEnable
+
             }
         }
 

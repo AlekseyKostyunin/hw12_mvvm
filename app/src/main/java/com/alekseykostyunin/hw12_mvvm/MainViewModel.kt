@@ -16,17 +16,15 @@ class MainViewModel : ViewModel() {
     private val _state = MutableStateFlow<State>(State.Initial)
     val state = _state.asStateFlow()
 
-    private val _error = Channel<String>()
-    val error = _error.receiveAsFlow()
+    private val _isEnabledButtonSearch= Channel<Boolean>()
+    val isEnabledButtonSearch = _isEnabledButtonSearch.receiveAsFlow()
 
     fun onSearchClick(text: String) {
         viewModelScope.launch {
             if (text.isEmpty()) {
                 _state.value = State.Error("Поле поиска не может быть пустым")
-                _error.send("Поле поиска не может быть пустым")
             } else if (text.length < 3) {
                 _state.value = State.Error("В запросе меньше 3 символов")
-                _error.send("В запросе меньше 3 символов")
             } else {
                 _state.value = State.Loading
                 delay(3000)
@@ -34,4 +32,11 @@ class MainViewModel : ViewModel() {
             }
         }
     }
+
+    fun onTextChanged(text: String){
+        viewModelScope.launch {
+            _isEnabledButtonSearch.send(text.length >= 3)
+        }
+    }
+
 }
